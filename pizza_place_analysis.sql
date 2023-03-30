@@ -473,17 +473,19 @@ SELECT * FROM pizza_type_trends;
 dashboard/graph with a top N filter. 
 */
 
+DROP TABLE pizza_trends; -- updating table by adding pizza_name column. 
 CREATE TEMPORARY TABLE pizza_trends 
 SELECT
 	pizza_types.category AS pizza_category,
 	pizza_type_trends.pizza_type_id,
+    pizza_types.pizza_name,
 	MONTH(date) AS month,
     SUM(quantity) AS total_sales
 FROM pizza_type_trends
 	LEFT JOIN pizza_types
 		ON pizza_type_trends.pizza_type_id = pizza_types.pizza_type_id
-GROUP BY 1,2,3
-ORDER BY 3,4 DESC;
+GROUP BY 1,2,3,4
+ORDER BY 4,5 DESC;
 
 SELECT * FROM pizza_trends;
 
