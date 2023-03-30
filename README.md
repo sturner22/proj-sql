@@ -26,3 +26,8 @@ After completing the analysis in SQL, I exported some tables as csv files and cr
 
 ### Insights gathered from the Pizza Place sales analysis
 
+* Peak hours at the restaurant are during lunchtime, from 12pm to 2pm, and again during dinner, 5pm to 7pm. Fridays were the busiest, with an average of 70 orders, and Sundays were the least busy on average, with around 50 orders. The busiest month of the year was July. 
+* The average number of pizzas per order was 2. The largest order of all contained 28 pizzas. Large was the most popular size, followed by medium. 
+* The best-selling pizza overall was "The Big Meat", size small, with 1,914 orders. The pizza type (all sizes included) that sold the most was The Classic Delux, with 2,453 sales
+* The most popular pizza types were the Pepperoni and Hawaiian pizzas. 
+* The highest revenue was seen in July, and the lowest in October. 
