@@ -2,27 +2,11 @@
 dataset. Observations and related queries for the analysis questions below are included throughout 
 this file in comments. 
 
-pizza_place_sales analysis questions: 
-
-1. How many customers do we have each day? Are there any peak hours?
-
-2. How many pizzas are typically in an order? Do we have any best sellers?
-
-3. How much money did we make this year? Can we identify any seasonality in the sales?
-
-4. Are there any pizzas we should take off the menu, or any promotions we could leverage? 
-*/
-
-/* Question 1. 
-- The data to answer this question is in the orders table. 
-1. Count order_id and group by date 
+/* Question 1: How many customers do we have each day? Are there any peak hours?
 -At a glance, most days have total orders in the 40s, 50s, and 60s. There is a spike on some holidays: July 4, 
 Thanksgiving and the day after Thanksgiving, and seemingly random, October 15. 
-2. Calculate total orders by month
-- July had the highest count of orders. 
-3. Calculate average orders by day of week 
- -Friday had the highest count of orders, on average, and Sunday had the lowest. 
-4. Calculate average orders by hour of day 
+- By Month, July had the highest count of orders. 
+- By day of week, Friday had the highest count of orders, on average, and Sunday had the lowest. 
 - Peak hours are during lunchtime, between 12pm to 2 pm, and then again (slightly lower) during dinner time, between 
 5pm to 7 pm. 
 Insights:
@@ -30,9 +14,8 @@ Insights:
 - Fridays were the busiest on average, with 70.76 orders (average) and Sundays were the least busy, with 50.46 orders (average)
 - Typical lunch and dinner hours brought in the most orders on average. The busiest hours were between 12 pm and 2 pm, 
 and  again between 5 pm and 7 pm. 
+- The queries I wrote to answer question 1 are below
 */
-
-SELECT * FROM orders;
 
 -- Average orders per day, overall:
 
