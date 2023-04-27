@@ -22,7 +22,7 @@ This is the EER diagram I created in MYSQL workbench.
 
 #### pizza place sales dashboard.xlsx
 
-After completing the analysis in SQL, I exported some tables as csv files and created a dashboard in Excel to visually represent the insights gathered from the data. There are two hidden worksheets in front of the pizza_place_dashboard worksheet that contain the data used in the charts, graphs, and functions on the dashboard. See next session for a summary of insights. 
+After completing the analysis in SQL, I exported some tables as csv files and created a dashboard in Excel to visually represent the insights gathered from the data. There are three hidden worksheets that contain the data used in the charts, graphs, and functions on the dashboard. See next session for a summary of insights. 
 
 ### Insights gathered from the Pizza Place sales analysis
 
@@ -31,3 +31,4 @@ After completing the analysis in SQL, I exported some tables as csv files and cr
 * The best-selling pizza overall was "The Big Meat", size small, with 1,914 orders. The pizza type (all sizes included) that sold the most was The Classic Delux, with 2,453 sales
 * The most popular pizza types were the Pepperoni and Hawaiian pizzas. 
 * The highest revenue was seen in July, and the lowest in October. 
+* The "Brie Carre" pizza, in the Supreme category, was the least ordered pizza type every month, although it did bring in orders each month. It is only available in one size, small. 
