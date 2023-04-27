@@ -50,18 +50,14 @@ GROUP BY date;
 
 -- Total orders by month: 
 
-CREATE TEMPORARY TABLE total_orders_by_month
 SELECT
 	MONTH(date) AS month,
     COUNT(DISTINCT order_id) AS total_orders
 FROM orders
 GROUP BY 1;
 
-SELECT * FROM total_orders_by_month;
-
 -- Average number of orders, by day of week:
 
-CREATE TEMPORARY TABLE avg_orders_by_weekday
 SELECT 
 	ROUND(COUNT(DISTINCT CASE WHEN day_of_week = 0 THEN order_id ELSE NULL END)/
 		COUNT(DISTINCT CASE WHEN day_of_week = 0 THEN date ELSE NULL END),0) AS avg_monday_orders,
@@ -85,8 +81,6 @@ SELECT
     WEEKDAY(date) AS day_of_week
 FROM orders) week_days;
 
-SELECT * FROM avg_orders_by_weekday;
-
 
 -- Checking out the earliest and latest orders. Orders were accepted between 9:52 am and 11:05 pm. 
 
@@ -97,7 +91,6 @@ FROM orders;
 
 -- Average count of orders by time (hour) of day: 
 
-CREATE TEMPORARY TABLE orders_by_time_of_day
 SELECT 
 	hour_of_day,
     ROUND(COUNT(DISTINCT order_id)/COUNT(DISTINCT date),2) AS avg_orders
@@ -111,7 +104,6 @@ FROM orders) hours
 GROUP BY 1
 ORDER BY 1;
 
-SELECT * FROM orders_by_time_of_day;
 
 /* Since the average orders for the 9 am and 10 am hour were both 1.00, I QA'd this with the below queries 
 and found that only one order was placed in the 9 am hour (it was almost 10 am, perhaps the pizza place opens at 10 am 
