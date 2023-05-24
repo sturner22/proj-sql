@@ -20,22 +20,22 @@ and  again between 5 pm and 7 pm.
 -- Average orders per day, overall:
 
 SELECT
-	COUNT(DISTINCT order_id)/COUNT(DISTINCT date) AS average_daily_orders
+COUNT(DISTINCT order_id)/COUNT(DISTINCT date) AS average_daily_orders
 FROM orders;
 
 -- Total orders by date: 
 
 SELECT
-	date,
-    COUNT(DISTINCT order_id) AS total_orders
+date,
+COUNT(DISTINCT order_id) AS total_orders
 FROM orders
 GROUP BY date;
 
 -- Total orders by month: 
 
 SELECT
-	MONTH(date) AS month,
-    COUNT(DISTINCT order_id) AS total_orders
+MONTH(date) AS month,
+COUNT(DISTINCT order_id) AS total_orders
 FROM orders
 GROUP BY 1;
 
@@ -57,32 +57,30 @@ SELECT
 	ROUND(COUNT(DISTINCT CASE WHEN day_of_week = 6 THEN order_id ELSE NULL END)/
 		COUNT(DISTINCT CASE WHEN day_of_week = 6 THEN date ELSE NULL END),0) AS avg_sunday_orders
 FROM 
-(
-SELECT 
-	order_id,
-    date,
-    WEEKDAY(date) AS day_of_week
+(SELECT 
+order_id,
+date,
+WEEKDAY(date) AS day_of_week
 FROM orders) week_days;
 
 
 -- Checking out the earliest and latest orders. Orders were accepted between 9:52 am and 11:05 pm. 
 
 SELECT 
-	MAX(time) AS lastest_order,
-    MIN(time) AS earliest_order
+MAX(time) AS lastest_order,
+MIN(time) AS earliest_order
 FROM orders;
 
 -- Average count of orders by time (hour) of day: 
 
 SELECT 
-	hour_of_day,
-    ROUND(COUNT(DISTINCT order_id)/COUNT(DISTINCT date),2) AS avg_orders
-FROM 
-(
-SELECT 
-	order_id,
-    date,
-    HOUR(time) AS hour_of_day
+hour_of_day,
+ROUND(COUNT(DISTINCT order_id)/COUNT(DISTINCT date),2) AS avg_orders
+FROM
+(SELECT 
+order_id,
+date,
+HOUR(time) AS hour_of_day
 FROM orders) hours
 GROUP BY 1
 ORDER BY 1;
@@ -126,25 +124,23 @@ SELECT
 	order_id,
 	SUM(distinct_pizza*quantity) AS pizzas_in_order
 FROM
-(
-SELECT
-	1 AS distinct_pizza,
-    order_details_id,
-    order_id,
-    pizza_id,
-    quantity
+(SELECT
+1 AS distinct_pizza,
+order_details_id,
+order_id,
+pizza_id,
+quantity
 FROM order_details) distinct_pizza_table
 GROUP BY order_id
 ORDER BY pizzas_in_order DESC;
 
-SELECT * FROM pizzas_per_order;
 
 -- The average, max, and min pizzas in an order 
 
 SELECT
-	AVG(pizzas_in_order) AS average_pizzas,
-    MAX(pizzas_in_order) AS max_pizzas,
-    MIN(pizzas_in_order) AS min_pizzas
+AVG(pizzas_in_order) AS average_pizzas,
+MAX(pizzas_in_order) AS max_pizzas,
+MIN(pizzas_in_order) AS min_pizzas
 FROM pizzas_per_order;
 
 -- total number of each pizza sold. This query includes both the type of pizza and the size
@@ -152,50 +148,44 @@ FROM pizzas_per_order;
 
 CREATE TEMPORARY TABLE pizza_revenues
 SELECT
-	pizza_id,
-    SUM(which_pizza*quantity) AS total_sold
+pizza_id,
+SUM(which_pizza*quantity) AS total_sold
 FROM 
-(
-
-SELECT 
-	1 AS which_pizza,
-    pizza_id,
-    quantity
+(SELECT 
+1 AS which_pizza,
+pizza_id,
+quantity
 FROM order_details) which_pizza_table
 GROUP BY pizza_id
 ORDER BY total_sold DESC;
 
-SELECT * FROM pizza_revenues;
 
 CREATE TEMPORARY TABLE pizza_orders_revenue
 SELECT
-	pizzas.pizza_type_id,
-	pizza_revenues.pizza_id,
-    pizza_revenues.total_sold,
-    pizza_revenues.total_sold*pizzas.price AS total_revenue
+pizzas.pizza_type_id,
+pizza_revenues.pizza_id,
+pizza_revenues.total_sold,
+pizza_revenues.total_sold*pizzas.price AS total_revenue
 FROM pizza_revenues
-	LEFT JOIN pizzas
-		ON pizza_revenues.pizza_id = pizzas.pizza_id
+LEFT JOIN pizzas
+	ON pizza_revenues.pizza_id = pizzas.pizza_id
 ORDER BY 3 DESC;
-
-SELECT * FROM pizza_orders_revenue;
 
 
 -- here is a count of total pizzas sold grouped by pizza_type_id, which includes all sizes for that pizza type. 
 
 SELECT
-	pizza_type_id,
-    SUM(which_pizza*quantity) AS total_pizzas_ordered
+pizza_type_id,
+SUM(which_pizza*quantity) AS total_pizzas_ordered
 FROM 
-(
-SELECT
-	1 AS which_pizza,
-    order_details.pizza_id,
-    order_details.quantity,
-    pizzas.pizza_type_id
+(SELECT
+1 AS which_pizza,
+order_details.pizza_id,
+order_details.quantity,
+pizzas.pizza_type_id
 FROM order_details
-	LEFT JOIN pizzas
-		ON order_details.pizza_id = pizzas.pizza_id) AS pizza_counts
+LEFT JOIN pizzas
+	ON order_details.pizza_id = pizzas.pizza_id) AS pizza_counts
 GROUP BY pizza_type_id
 ORDER BY 2 DESC;
 
@@ -203,18 +193,17 @@ ORDER BY 2 DESC;
 
 CREATE TEMPORARY TABLE popular_pizzas
 SELECT
-	pizza_type_id,
-    SUM(which_pizza*quantity) AS total_pizzas_ordered
+pizza_type_id,
+SUM(which_pizza*quantity) AS total_pizzas_ordered
 FROM 
-(
-SELECT
-	1 AS which_pizza,
-    order_details.pizza_id,
-    order_details.quantity,
-    pizzas.pizza_type_id
+(SELECT
+1 AS which_pizza,
+order_details.pizza_id,
+order_details.quantity,
+pizzas.pizza_type_id
 FROM order_details
-	LEFT JOIN pizzas
-		ON order_details.pizza_id = pizzas.pizza_id) AS pizza_counts
+LEFT JOIN pizzas
+	ON order_details.pizza_id = pizzas.pizza_id) AS pizza_counts
 GROUP BY pizza_type_id
 ORDER BY 2 DESC;
 
@@ -228,17 +217,16 @@ DROP TABLE pizza_ingredients_categories; -- I ended up making several updates to
 
 CREATE TEMPORARY TABLE pizza_ingredients_categories
 SELECT
-	pizza_types.category,
-	popular_pizzas.pizza_type_id,
-    pizza_types.pizza_name,
-    popular_pizzas.total_pizzas_ordered,
-    pizza_types.ingredients
+pizza_types.category,
+popular_pizzas.pizza_type_id,
+pizza_types.pizza_name,
+popular_pizzas.total_pizzas_ordered,
+pizza_types.ingredients
 FROM popular_pizzas
-	LEFT JOIN pizza_types
-		ON popular_pizzas.pizza_type_id = pizza_types.pizza_type_id
+LEFT JOIN pizza_types
+	ON popular_pizzas.pizza_type_id = pizza_types.pizza_type_id
 ORDER BY 4 DESC;
 
-SELECT * FROM pizza_ingredients_categories;
 
 -- which size of pizza is the most popular to order? The least? 
 
@@ -247,33 +235,31 @@ a foreign key, but, the value in the size column is expected to repeat, so this 
 
 CREATE TEMPORARY TABLE pizza_size_counts
 SELECT
-	pizza_size,
-    SUM(which_pizza*quantity) AS total_pizzas_ordered
+pizza_size,
+SUM(which_pizza*quantity) AS total_pizzas_ordered
 FROM 
-(
-SELECT 
-	1 AS which_pizza,
-    pizzas.size AS pizza_size,
-    order_details.pizza_id,
-    order_details.quantity
+(SELECT 
+1 AS which_pizza,
+pizzas.size AS pizza_size,
+order_details.pizza_id,
+order_details.quantity
 FROM order_details
-	LEFT JOIN pizzas 
-		ON order_details.pizza_id = pizzas.pizza_id) AS pizza_sizes_table
+LEFT JOIN pizzas 
+	ON order_details.pizza_id = pizzas.pizza_id) AS pizza_sizes_table
 GROUP BY 1
 ORDER BY 2 DESC;
 
-SELECT * FROM pizza_size_counts;
 
 /* Checking to see if there are any pizzas on the menu that sold none at all. Every pizza_type sold, there were 
 some sizes of certain types that did not sell. Note: change the first column to pizza_id to see which pizza type/size combos
 sold none. */
 
 SELECT
-	pizzas.pizza_type_id,
-    COUNT(order_details.order_id) AS total_orders
+pizzas.pizza_type_id,
+COUNT(order_details.order_id) AS total_orders
 FROM pizzas
-	LEFT JOIN order_details
-		ON pizzas.pizza_id = order_details.pizza_id
+LEFT JOIN order_details
+	ON pizzas.pizza_id = order_details.pizza_id
 GROUP BY 1
 ORDER BY 2;
 
@@ -289,25 +275,23 @@ Total revenue for 2015: 817,860.05
 -- The following query contains two queries, and ends in  the total cost, grouped by order_id. 
 
 SELECT -- this is the final query, which calculates the total cost for each order 
-	order_id,
-    SUM(total_quantity*price) AS order_total
+order_id,
+SUM(total_quantity*price) AS order_total
 FROM
-(
-SELECT -- this is the second query, which calculates the total quantity of each type of pizza per order 
-	order_id,
-    SUM(which_pizza*quantity) AS total_quantity,
-    price
+(SELECT -- this is the second query, which calculates the total quantity of each type of pizza per order 
+order_id,
+SUM(which_pizza*quantity) AS total_quantity,
+price
 FROM
-( 
-SELECT -- This is the first query, to pull in price of the pizza and add a dummy column (1) to calculate the quantity 
-    order_id,
-    1 AS which_pizza,
-    order_details.pizza_id,
-    quantity,
-    pizzas.price
+( SELECT -- This is the first query, to pull in price of the pizza and add a dummy column (1) to calculate the quantity 
+order_id,
+1 AS which_pizza,
+order_details.pizza_id,
+quantity,
+pizzas.price
 FROM order_details
-	LEFT JOIN pizzas
-		ON order_details.pizza_id = pizzas.pizza_id) AS pizza_price_table -- query 1 table alias 
+LEFT JOIN pizzas
+	ON order_details.pizza_id = pizzas.pizza_id) AS pizza_price_table -- query 1 table alias 
 GROUP BY order_id, price) AS pizza_price_table_2 -- query 2 table alias 
 GROUP BY 1;
 
@@ -318,62 +302,57 @@ further analyze trends in sales.
 
 CREATE TEMPORARY TABLE total_sales
 SELECT 
-	order_id,
-    SUM(total_quantity*price) AS order_total
+order_id,
+SUM(total_quantity*price) AS order_total
 FROM
-(
-SELECT 
-	order_id,
-    SUM(which_pizza*quantity) AS total_quantity,
-    price
+(SELECT 
+order_id,
+SUM(which_pizza*quantity) AS total_quantity,
+price
 FROM
-( 
-SELECT 
-    order_id,
-    1 AS which_pizza,
-    order_details.pizza_id,
-    quantity,
-    pizzas.price
+( SELECT 
+order_id,
+1 AS which_pizza,
+order_details.pizza_id,
+quantity,
+pizzas.price
 FROM order_details
-	LEFT JOIN pizzas
-		ON order_details.pizza_id = pizzas.pizza_id) AS pizza_price_table 
+LEFT JOIN pizzas
+	ON order_details.pizza_id = pizzas.pizza_id) AS pizza_price_table 
 GROUP BY order_id, price) AS pizza_price_table_2 
 GROUP BY 1;
 
-SELECT * FROM total_sales;
 
 -- create another orders table, which includes the total cost, date, and time, for each order_id 
 
 CREATE TEMPORARY TABLE orders_v2
 SELECT
-	orders.order_id,
-    total_sales.order_total,
-    orders.date,
-    orders.time
+orders.order_id,
+total_sales.order_total,
+orders.date,
+orders.time
 FROM orders
-	INNER JOIN total_sales
-		ON orders.order_id = total_sales.order_id;
+INNER JOIN total_sales
+	ON orders.order_id = total_sales.order_id;
 
-SELECT * FROM orders_v2;
 
 -- total revenue by month:
 
 CREATE TEMPORARY TABLE revenue_by_month
 SELECT 
-	MONTH(date) AS month,
-    ROUND(SUM(order_total), 2) AS total_revenue
+MONTH(date) AS month,
+ROUND(SUM(order_total), 2) AS total_revenue
 FROM orders_v2
 GROUP BY 1
 ORDER BY 1;
 
-SELECT * FROM revenue_by_month;
 
 -- creating another table to include total revenue and total orders, grouped by month
 
 SELECT 
-	MONTH(date) AS month,
-    SUM(order_total) AS total_revenue,
-    COUNT(DISTINCT order_id) AS total_orders
+MONTH(date) AS month,
+SUM(order_total) AS total_revenue,
+COUNT(DISTINCT order_id) AS total_orders
 FROM orders_v2
 GROUP BY 1;
 
@@ -381,13 +360,12 @@ GROUP BY 1;
 
 CREATE TEMPORARY TABLE revenue_by_hour
 SELECT
-	HOUR(time) AS hour_of_day,
-    SUM(order_total) AS total_revenue
+HOUR(time) AS hour_of_day,
+SUM(order_total) AS total_revenue
 FROM orders_v2
 GROUP BY 1
 ORDER BY 1;
 
-SELECT * FROM revenue_by_hour;
 
 -- total revenue for 2015: 
 
@@ -399,29 +377,26 @@ FROM orders_v2;
 
 CREATE TEMPORARY TABLE revenue_by_category_prep
 SELECT 
-	order_details.order_id,
-    pizzas.pizza_id,
-    pizza_types.pizza_type_id,
-    pizza_types.category,
-    order_details.quantity,
-    pizzas.price
+order_details.order_id,
+pizzas.pizza_id,
+pizza_types.pizza_type_id,
+pizza_types.category,
+order_details.quantity,
+pizzas.price
 FROM order_details
-	LEFT JOIN pizzas 
-		ON order_details.pizza_id = pizzas.pizza_id
-	LEFT JOIN pizza_types
-		ON pizzas.pizza_type_id = pizza_types.pizza_type_id;
-        
-SELECT * FROM revenue_by_category_prep;
+LEFT JOIN pizzas 
+	ON order_details.pizza_id = pizzas.pizza_id
+LEFT JOIN pizza_types
+	ON pizzas.pizza_type_id = pizza_types.pizza_type_id;
 
 CREATE TEMPORARY TABLE revenue_by_category
 SELECT
-	category,
-    SUM(quantity*price) AS total_revenue
+category,
+SUM(quantity*price) AS total_revenue
 FROM revenue_by_category_prep
 GROUP BY 1
 ORDER BY 2 DESC;
 
-SELECT * FROM revenue_by_category;
 
 /* Do certain pizzas sell better during certain months? Or certain times of day? 
 - Start with order_details; bring in pizza_type_id from the pizzas table, then bring in the date and time 
@@ -430,19 +405,18 @@ from the orders table.
 
 CREATE TEMPORARY TABLE pizza_type_trends
 SELECT 
-	order_details.order_id,
-    order_details.pizza_id,
-    pizzas.pizza_type_id,
-    quantity,
-    date,
-    time
+order_details.order_id,
+order_details.pizza_id,
+pizzas.pizza_type_id,
+quantity,
+date,
+time
 FROM order_details
-	LEFT JOIN pizzas 
-		ON order_details.pizza_id = pizzas.pizza_id
-	LEFT JOIN orders
-		ON order_details.order_id = orders.order_id; 
+LEFT JOIN pizzas 
+	ON order_details.pizza_id = pizzas.pizza_id
+LEFT JOIN orders
+	ON order_details.order_id = orders.order_id; 
 
-SELECT * FROM pizza_type_trends;
 
 /* Total sales by pizza type and month. This would be a good table to export to Excel and create an interactive 
 dashboard/graph with a top N filter. 
@@ -451,45 +425,41 @@ dashboard/graph with a top N filter.
 DROP TABLE pizza_trends; -- updating table by adding pizza_name column. 
 CREATE TEMPORARY TABLE pizza_trends 
 SELECT
-	pizza_types.category AS pizza_category,
-	pizza_type_trends.pizza_type_id,
-    pizza_types.pizza_name,
-	MONTH(date) AS month,
-    SUM(quantity) AS total_sales
+pizza_types.category AS pizza_category,
+pizza_type_trends.pizza_type_id,
+pizza_types.pizza_name,
+MONTH(date) AS month,
+SUM(quantity) AS total_sales
 FROM pizza_type_trends
-	LEFT JOIN pizza_types
-		ON pizza_type_trends.pizza_type_id = pizza_types.pizza_type_id
+LEFT JOIN pizza_types
+	ON pizza_type_trends.pizza_type_id = pizza_types.pizza_type_id
 GROUP BY 1,2,3,4
 ORDER BY 4,5 DESC;
-
-SELECT * FROM pizza_trends;
 
 -- more specifically, which exact pizza (not pizza type) brought in the most sales by month? The least? 
 
 CREATE TEMPORARY TABLE exact_pizza_trends
 SELECT
-	pizza_id,
-    MONTH(date) AS month,
-    SUM(quantity) AS total_orders
+pizza_id,
+    ONTH(date) AS month,
+SUM(quantity) AS total_orders
 FROM 
-(
-SELECT 
-	order_details.order_id,
-    order_details.pizza_id,
-    quantity,
-    date,
-    time
+(SELECT 
+order_details.order_id,
+order_details.pizza_id,
+quantity,
+date,
+time
 FROM order_details
-	LEFT JOIN orders
-		ON order_details.order_id = orders.order_id) AS exact_pizzas_table
+LEFT JOIN orders
+	ON order_details.order_id = orders.order_id) AS exact_pizzas_table
 GROUP BY 1,2
 ORDER BY 2, 3 DESC;
 
-SELECT * FROM exact_pizza_trends;
 
 SELECT
-	month,
-    total_sales
+month,
+total_sales
 FROM pizza_trends
 WHERE pizza_type_id = 'brie_carre'
 ORDER BY total_sales DESC;
@@ -505,17 +475,17 @@ remove it from the menu due to consistently low sales.
 */
 
 SELECT
-	order_details.pizza_id,
-    HOUR(time) AS hour,
-    COUNT(order_details.order_id) AS total_orders
+order_details.pizza_id,
+HOUR(time) AS hour,
+COUNT(order_details.order_id) AS total_orders
 FROM order_details
-	INNER JOIN orders
-		ON order_details.order_id = orders.order_id 
+INNER JOIN orders
+	ON order_details.order_id = orders.order_id 
 WHERE order_details.pizza_id = 'brie_carre_s'
 GROUP BY 1,2
 ORDER BY 3 DESC;
 
 
-SELECT * FROM pizza_types;
+
 
 
