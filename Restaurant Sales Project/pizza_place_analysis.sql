@@ -134,6 +134,17 @@ FROM order_details) distinct_pizza_table
 GROUP BY order_id
 ORDER BY pizzas_in_order DESC;
 
+-- percentage of orders that have one, two, three, four, and five or more pizzas: 
+
+select
+	round((count(case when pizzas_in_order = 1 then order_id else null end)/count(order_id))*100,2) as one_pizza,
+    round((count(case when pizzas_in_order = 2 then order_id else null end)/count(order_id))*100,2) as two_pizzas,
+    round((count(case when pizzas_in_order = 3 then order_id else null end)/count(order_id))*100,2) as three_pizzas,
+    round((count(case when pizzas_in_order = 4 then order_id else null end)/count(order_id))*100,2) as four_pizzas,
+    round((count(case when pizzas_in_order >= 5 then order_id else null end)/count(order_id))*100,2) as five_or_more_pizzas
+from 
+	pizzas_per_order;
+
 
 -- The average, max, and min pizzas in an order 
 
