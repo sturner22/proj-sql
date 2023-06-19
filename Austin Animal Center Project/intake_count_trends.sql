@@ -5,7 +5,7 @@ the City of Austin's open data portal on 6/13/2023. The data contains intake dat
 --  Step 1: create a table and import data
 
 create table aac_intakes (
-	animal_id varchar(25)
+    animal_id varchar(25)
    ,intake_date date
    ,animal_name varchar(50)
    ,found_location varchar(255)
@@ -35,12 +35,12 @@ have incomplete data.
 */
 
 create temporary table intakes_by_yr as (
-	select
-		date_part('year',a.intake_date) as intake_yr
+    select
+        date_part('year',a.intake_date) as intake_yr
 	   ,count(a.animal_id) as num_intakes
 
 	from
-		aac_intakes a
+        aac_intakes a
 	
 	where	( 
 			animal_type = 'Dog'
@@ -72,11 +72,11 @@ from
 -- Running total of intakes by year
 
 select
-	i.intake_yr
+    i.intake_yr
    ,sum(i.num_intakes) over(order by i.intake_yr) as running_total_by_yr
 
 from
-	intakes_by_yr i
+    intakes_by_yr i
 ;
 
 /* I want to find the percent change in intakes year over year. 
@@ -87,16 +87,16 @@ for those years
 */
 
 create temporary table yr_prior_yr_intakes as (
-	select
-		i.intake_yr
+    select
+        i.intake_yr
 	   ,cast(i.num_intakes as numeric) as num_intakes
 	   ,lag(cast((i.num_intakes) as numeric)) over(order by i.intake_yr) 
 			as prior_yr_num_intakes
 
 	 from
-		intakes_by_yr i
+        intakes_by_yr i
 	 where 
-		i.intake_yr not in(
+        i.intake_yr not in(
 							2013 --incomplete data for year
 						   ,2023 -- incomplete data for year
 						  )
@@ -116,13 +116,13 @@ year. The calculation is completed in the third item in the select clause
 */
 
 select
-	p.intake_yr
+    p.intake_yr
    ,p.num_intakes
    ,(round((p.num_intakes-p.prior_yr_num_intakes)/p.prior_yr_num_intakes,3))*100 
 		  as pct_change
 
 from
-	yr_prior_yr_intakes p
+    yr_prior_yr_intakes p
 ;
 
 
@@ -132,18 +132,18 @@ use count-case, and create a temporary table for the result.
 */
 
 create temporary table dog_cat_intakes as (
-select
-	date_part('year',a.intake_date) as intake_yr
-   ,count(case when a.animal_type= 'Dog' then a.animal_id else null end) as dog_intakes
-   ,count(case when a.animal_type= 'Cat' then a.animal_id else null end) as cat_intakes
+    select
+	    date_part('year',a.intake_date) as intake_yr
+       ,count(case when a.animal_type= 'Dog' then a.animal_id else null end) as dog_intakes
+       ,count(case when a.animal_type= 'Cat' then a.animal_id else null end) as cat_intakes
 
-from
-	aac_intakes a
+    from
+        aac_intakes a
 
-group by
-	date_part('year',a.intake_date)
-order by
-	intake_yr
+    group by
+        date_part('year',a.intake_date)
+    order by
+        intake_yr
 )
 ;
 
@@ -152,8 +152,8 @@ year's intakes into the same row; this time I'll just need to do it twice
 */
 
 create temporary table yr_prior_dog_cat_intakes as (
-	select
-		dc.intake_yr
+    select
+        dc.intake_yr
 	   ,cast(dc.dog_intakes as numeric) as dog_intakes
 	   ,lag(cast((dc.dog_intakes) as numeric)) over(order by dc.intake_yr) 
 			as prior_yr_dog_intakes
@@ -161,11 +161,11 @@ create temporary table yr_prior_dog_cat_intakes as (
 	   ,lag(cast((dc.cat_intakes) as numeric)) over(order by dc.intake_yr) 
 			as prior_yr_cat_intakes
 
-	 from
+     from
 		dog_cat_intakes dc
-	 where 
+     where 
 		dc.intake_yr not in(
-							2013 --incomplete data for year
+						    2013 --incomplete data for year
 						   ,2023 -- incomplete data for year
 						  )
 )
@@ -176,7 +176,7 @@ from the previous year.
 */
 
 select
-	p.intake_yr
+    p.intake_yr
    ,p.dog_intakes
    ,(round((p.dog_intakes-p.prior_yr_dog_intakes)/p.prior_yr_dog_intakes,3))*100 
 		  as pct_change_dogs
@@ -185,7 +185,7 @@ select
 		  as pct_change_cats
 
 from
-	yr_prior_dog_cat_intakes p
+    yr_prior_dog_cat_intakes p
 ;
 
 /* What months are the busiest for dog and cat intakes? Are there any monthly trends year over year?
@@ -196,104 +196,104 @@ year-over-year trends.
 
 -- Step 1: Create a table to count intakes, grouped by year and then month
 
-select * from year_month_intakes
+
 create temporary table year_month_intakes as (
-select	
-	date_part('year',a.intake_date) as intake_yr
-   ,date_part('month',a.intake_date) as intake_month
-   ,a.animal_type
-   ,count(a.animal_id) as total_intakes
+    select	
+        date_part('year',a.intake_date) as intake_yr
+       ,date_part('month',a.intake_date) as intake_month
+       ,a.animal_type
+       ,count(a.animal_id) as total_intakes
 
-from 
-	aac_intakes a
+    from 
+        aac_intakes a
 
-where
-	date_part('year',a.intake_date) <> '2013' -- only 3 months of data for 2013
+    where
+         date_part('year',a.intake_date) <> '2013' -- only 3 months of data for 2013
 	
-	  and 
+    and 
 	   (
-		  a.animal_type = 'Dog'
+          a.animal_type = 'Dog'
 	  or  a.animal_type = 'Cat'
 	   )
 	
 
-group by 
-	date_part('year',a.intake_date) 
-   ,date_part('month',a.intake_date)
-   ,a.animal_type
+    group by 
+        date_part('year',a.intake_date) 
+       ,date_part('month',a.intake_date)
+       ,a.animal_type
 
-order by
-	intake_yr asc
-   ,intake_month asc
+    order by
+        intake_yr asc
+       ,intake_month asc
 )
 ;
 
 -- Step 2: Create a table that includes the month with the highest dog intakes, for each year 
 
 create temporary table highest_monthly_dog_intakes as (
-select 
-	y.intake_yr
-   ,y.intake_month
-   ,y.animal_type
-   ,y.total_intakes
+    select 
+        y.intake_yr
+       ,y.intake_month
+       ,y.animal_type
+       ,y.total_intakes
 
-from 
-	year_month_intakes y
+    from 
+        year_month_intakes y
 
-where 
-	(y.intake_yr
-    ,y.total_intakes) IN (
-							select
-								intake_yr
-							   ,max(total_intakes)
-							from
-								year_month_intakes
-							where 
-								animal_type = 'Dog'
-							group by 
-								intake_yr
+    where 
+        (y.intake_yr
+        ,y.total_intakes) IN (
+							    select
+								  intake_yr
+							     ,max(total_intakes)
+							    from
+								  year_month_intakes
+							    where 
+								  animal_type = 'Dog'
+							    group by 
+								  intake_yr
    						  )
-order by
-	y.intake_yr asc
-   ,y.intake_month asc
+    order by
+        y.intake_yr asc
+       ,y.intake_month asc
 )
 ;
 
 -- Step 3: Repeat step 2, but for cats 
 
 create temporary table highest_monthly_cat_intakes as (
-select 
-	y.intake_yr
-   ,y.intake_month
-   ,y.animal_type
-   ,y.total_intakes
+    select 
+        y.intake_yr
+       ,y.intake_month
+       ,y.animal_type
+       ,y.total_intakes
 
-from 
-	year_month_intakes y
+    from 
+        year_month_intakes y
 
-where 
-	(y.intake_yr
-    ,y.total_intakes) IN (
-							select
-								intake_yr
-							   ,max(total_intakes)
-							from
-								year_month_intakes
-							where 
-								animal_type = 'Cat'
-							group by 
-								intake_yr
-   						  )
-order by
-	y.intake_yr asc
-   ,y.intake_month asc
+    where 
+        (y.intake_yr
+        ,y.total_intakes) IN (
+							    select
+								  intake_yr
+							     ,max(total_intakes)
+							    from
+								  year_month_intakes
+							    where 
+								  animal_type = 'Cat'
+							    group by 
+								  intake_yr
+   						    )
+    order by
+        y.intake_yr asc
+       ,y.intake_month asc
 )
 ;
 
 -- Step 4: Join the dog and cat tables together on intake_yr
 
 select
-	d.intake_yr
+    d.intake_yr
    ,d.intake_month as busiest_dog_month
    ,d.animal_type
    ,d.total_intakes as dog_intakes
@@ -302,9 +302,9 @@ select
    ,c.total_intakes as cat_intakes
 
 from 
-	highest_monthly_dog_intakes d
+    highest_monthly_dog_intakes d
 		
-		inner join highest_monthly_cat_intakes c
+        inner join highest_monthly_cat_intakes c
 			on d.intake_yr = c.intake_yr
 ;
 
