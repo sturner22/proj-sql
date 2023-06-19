@@ -268,13 +268,13 @@ create temporary table breed_intakes_by_year as (
 -- Step 2: select max of count of intakes for each year
 
 with row_num_breed_intakes as (
-	select
+    select
         row_number() over(partition by b.intake_yr order by b.num_intakes desc) as row_num
-	   ,b.intake_yr
-	   ,b.breed
-	   ,b.num_intakes
+       ,b.intake_yr
+       ,b.breed
+       ,b.num_intakes
 
-	from 	
+    from 	
         breed_intakes_by_year b
 )
 
