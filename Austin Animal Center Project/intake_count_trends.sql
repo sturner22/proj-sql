@@ -37,12 +37,12 @@ have incomplete data.
 create temporary table intakes_by_yr as (
     select
         date_part('year',a.intake_date) as intake_yr
-	   ,count(a.animal_id) as num_intakes
+       ,count(a.animal_id) as num_intakes
 
-	from
+    from
         aac_intakes a
 	
-	where	( 
+    where	( 
 			animal_type = 'Dog'
 		or	animal_type = 'Cat'
 			)
@@ -53,10 +53,10 @@ create temporary table intakes_by_yr as (
 												   )
 			)
 
-	group by 
+    group by 
 		date_part('year',a.intake_date)
 
-	order by 
+    order by 
 		intake_yr
 )
 ;
@@ -89,15 +89,15 @@ for those years
 create temporary table yr_prior_yr_intakes as (
     select
         i.intake_yr
-	   ,cast(i.num_intakes as numeric) as num_intakes
-	   ,lag(cast((i.num_intakes) as numeric)) over(order by i.intake_yr) 
+       ,cast(i.num_intakes as numeric) as num_intakes
+       ,lag(cast((i.num_intakes) as numeric)) over(order by i.intake_yr) 
 			as prior_yr_num_intakes
 
-	 from
+    from
         intakes_by_yr i
-	 where 
+    where 
         i.intake_yr not in(
-							2013 --incomplete data for year
+                            2013 --incomplete data for year
 						   ,2023 -- incomplete data for year
 						  )
 )
@@ -133,7 +133,7 @@ use count-case, and create a temporary table for the result.
 
 create temporary table dog_cat_intakes as (
     select
-	    date_part('year',a.intake_date) as intake_yr
+        date_part('year',a.intake_date) as intake_yr
        ,count(case when a.animal_type= 'Dog' then a.animal_id else null end) as dog_intakes
        ,count(case when a.animal_type= 'Cat' then a.animal_id else null end) as cat_intakes
 
@@ -154,17 +154,17 @@ year's intakes into the same row; this time I'll just need to do it twice
 create temporary table yr_prior_dog_cat_intakes as (
     select
         dc.intake_yr
-	   ,cast(dc.dog_intakes as numeric) as dog_intakes
-	   ,lag(cast((dc.dog_intakes) as numeric)) over(order by dc.intake_yr) 
+       ,cast(dc.dog_intakes as numeric) as dog_intakes
+       ,lag(cast((dc.dog_intakes) as numeric)) over(order by dc.intake_yr) 
 			as prior_yr_dog_intakes
-	   ,cast(dc.cat_intakes as numeric) as cat_intakes
-	   ,lag(cast((dc.cat_intakes) as numeric)) over(order by dc.intake_yr) 
+       ,cast(dc.cat_intakes as numeric) as cat_intakes
+       ,lag(cast((dc.cat_intakes) as numeric)) over(order by dc.intake_yr) 
 			as prior_yr_cat_intakes
 
-     from
-		dog_cat_intakes dc
-     where 
-		dc.intake_yr not in(
+    from
+        dog_cat_intakes dc
+    where 
+        dc.intake_yr not in(
 						    2013 --incomplete data for year
 						   ,2023 -- incomplete data for year
 						  )
@@ -244,14 +244,14 @@ create temporary table highest_monthly_dog_intakes as (
         (y.intake_yr
         ,y.total_intakes) IN (
 							    select
-								  intake_yr
-							     ,max(total_intakes)
+								   intake_yr
+                                  ,max(total_intakes)
 							    from
-								  year_month_intakes
+								   year_month_intakes
 							    where 
-								  animal_type = 'Dog'
+								   animal_type = 'Dog'
 							    group by 
-								  intake_yr
+								   intake_yr
    						  )
     order by
         y.intake_yr asc
@@ -275,8 +275,8 @@ create temporary table highest_monthly_cat_intakes as (
         (y.intake_yr
         ,y.total_intakes) IN (
 							    select
-								  intake_yr
-							     ,max(total_intakes)
+                                    intake_yr
+                                    ,max(total_intakes)
 							    from
 								  year_month_intakes
 							    where 
