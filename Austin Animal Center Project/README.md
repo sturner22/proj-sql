@@ -9,7 +9,7 @@ Click on the files to view my sql queries. I plan to create a dashboard to showc
 * For dogs and cats with more than one intake between 2013 and 2023, stray is the most common intake type, followed by owner surrender.
 * Pit Bull Mix was the dog breed with the most intakes for every year (2014-2022) except for 2019, when labrador retriever mix was the breed with the most intakes. However, interesting to note, the total Pit Bull Mix intakes for the most recent two full years of data, 2021 and 2022, decreased more than 50% from the first full year of data, 2014.
 
-##### SQL skills demonstrated in this project
+### SQL skills demonstrated in this project
 * Creating tables and importing data
 * Joins
 * Subqueries
