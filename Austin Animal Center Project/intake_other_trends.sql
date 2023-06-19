@@ -9,28 +9,28 @@ Note: 2013 and 2023 are excluded due to incomplete data.
 */
 
 select
-	date_part('year',a.intake_date) as intake_year
+    date_part('year',a.intake_date) as intake_year
    ,a.intake_type
    ,a.animal_type
    ,count(a.animal_id) as num_animals
    
 from
-	aac_intakes a
+    aac_intakes a
 
 where
-	date_part('year',a.intake_date) not in (
+    date_part('year',a.intake_date) not in (
 											  '2013' -- incomplete data
 											  '2023' -- incomplete data
 										   )
 		                            and a.animal_type <> 'Other' -- too ambiguous
 
 group by 
-	date_part('year',a.intake_date)
+    date_part('year',a.intake_date)
    ,a.intake_type
    ,a.animal_type
 
 order by
-	intake_year,
+    intake_year,
 	num_animals desc
 ;
 
@@ -42,22 +42,22 @@ query since I am not looking at trends.
 */
 
 select
-	a.animal_id
+    a.animal_id
    ,a.animal_type
    ,count(a.animal_id) as num_intakes
 
 from
-	aac_intakes a
+    aac_intakes a
 
 group by 
-	a.animal_id
+    a.animal_id
    ,a.animal_type
 
 having 
-	count(a.animal_id) > 1
+    count(a.animal_id) > 1
 
 order by 
-	num_intakes desc
+    num_intakes desc
 ;
 
 /* Wow, there are 12,114 animals with more than one intake between 2013-2023. 
@@ -89,14 +89,14 @@ select
    ,count(a.animal_id) as num_intakes
 
 from
-	aac_intakes a
+    aac_intakes a
 
 group by 
     a.animal_type
    ,a.intake_type
 
 having 
-	count(a.animal_id) > 1
+    count(a.animal_id) > 1
 
 order by 
     num_intakes desc
@@ -109,12 +109,12 @@ intake type, followed by owner surrender
 -- I'm curious now, what does animal_type other include? 
 
 select 
-	distinct 
-		a.breed
+    distinct 
+        a.breed
 from
-	aac_intakes a
+    aac_intakes a
 where
-	a.animal_type = 'Other'
+    a.animal_type = 'Other'
 ;
 
 /* The answer: a variety of rabbits, bats, raccoons, hamsters, snakes, foxes, 
@@ -129,36 +129,36 @@ based on intake types: stray, owner surrender, and public assist?
 
 create temporary table dogs_w_multiple_intakes as (
 	select 
-		a.animal_id
+        a.animal_id
 	   ,count(a.animal_id) as num_intakes
 
 	from 
-		aac_intakes a
+        aac_intakes a
 
 	where 
-		a.animal_type = 'Dog'
+        a.animal_type = 'Dog'
 
 	group by 
-		a.animal_id
+        a.animal_id
 
 	having
-		count(a.animal_id) > 1
+        count(a.animal_id) > 1
 )
 ;
 -- Step 2: assign row numbers for each intake, for each animal_id. Join to temporary table created above. 
 
 create temporary table row_num_intake_dts as (
 	select
-		row_number() over(partition by a.animal_id order by a.intake_date) as intake_num
+        row_number() over(partition by a.animal_id order by a.intake_date) as intake_num
 	   ,a.animal_id
 	   ,a.animal_type
 	   ,a.intake_type
 	   ,a.intake_date
 
 	from 
-		aac_intakes a
-	  inner join dogs_w_multiple_intakes i
-			on a.animal_id = i.animal_id
+        aac_intakes a
+          inner join dogs_w_multiple_intakes i
+            on a.animal_id = i.animal_id
 )
 ;
 
@@ -166,29 +166,29 @@ create temporary table row_num_intake_dts as (
 
 create temporary table all_intake_dates as (
 with intake_and_next_intake as (
-select
-	r.intake_num
-   ,r.animal_id
-   ,r.intake_type
-   ,r.intake_date
-   ,lead(intake_date) over(partition by r.animal_id order by r.intake_date) as next_intake_dt
+    select
+        r.intake_num
+       ,r.animal_id
+       ,r.intake_type
+       ,r.intake_date
+       ,lead(intake_date) over(partition by r.animal_id order by r.intake_date) as next_intake_dt
 
-from
-	row_num_intake_dts r
+    from
+        row_num_intake_dts r
 )
 
 select
-	i.intake_num
+    i.intake_num
    ,i.animal_id
    ,i.intake_type
    ,i.intake_date
    ,i.next_intake_dt
 
 from 
-	intake_and_next_intake i	
+    intake_and_next_intake i	
 
 where
-	next_intake_dt is not null
+    next_intake_dt is not null
 )
 ;
 
@@ -204,28 +204,27 @@ select
    ,ad.next_intake_dt-ad.intake_date as days_between_intakes
 
 from
-	all_intake_dates ad
+    all_intake_dates ad
 order by
-	days_between_intakes asc
-	,ad.intake_type 
+    days_between_intakes asc
+   ,ad.intake_type 
 )
 ;
-select * from date_diff_intakes
 
 -- Step 5: Group the results of date_diff_intakes by intake_type
 
 select
-	dd.intake_type
+    dd.intake_type
    ,avg(dd.days_between_intakes) as avg_btwn_intakes
 
 from 
-	date_diff_intakes dd
+    date_diff_intakes dd
 
 group by
-	dd.intake_type
+    dd.intake_type
 
 order by 
-	avg_btwn_intakes desc
+    avg_btwn_intakes desc
 ;
 
 /* conclusion: public assist intake type has the most number of days between intakes, on average,
@@ -241,28 +240,28 @@ Has this changed at all between 2014 and 2022?
 -- Step 1: Create a table to count intakes by year and dog breed
 
 create temporary table breed_intakes_by_year as (
-select
-	date_part('year',a.intake_date) as intake_yr
-   ,a.breed
-   ,count(a.animal_id) as num_intakes
+    select
+        date_part('year',a.intake_date) as intake_yr
+       ,a.breed
+       ,count(a.animal_id) as num_intakes
 
-from
-	aac_intakes a
+    from
+        aac_intakes a
 	
-where 
-	animal_type = 'Dog'
-	and date_part('year',a.intake_date) not in (
-												  '2013' -- incomplete data
-								                 ,'2023' -- incomplete data
-											   )
+    where 
+        animal_type = 'Dog'
+	    and date_part('year',a.intake_date) not in (
+                                                     '2013' -- incomplete data
+                                                    ,'2023' -- incomplete data
+											       )
 
-group by 
-	date_part('year',a.intake_date)
-   ,a.breed
+    group by 
+         date_part('year',a.intake_date)
+        ,a.breed
 
-order by 
-	intake_yr
-   ,num_intakes desc
+    order by 
+        intake_yr
+       ,num_intakes desc
 )
 ;
 
@@ -270,26 +269,26 @@ order by
 
 with row_num_breed_intakes as (
 	select
-		row_number() over(partition by b.intake_yr order by b.num_intakes desc) as row_num
+        row_number() over(partition by b.intake_yr order by b.num_intakes desc) as row_num
 	   ,b.intake_yr
 	   ,b.breed
 	   ,b.num_intakes
 
 	from 	
-		breed_intakes_by_year b
+        breed_intakes_by_year b
 )
 
 select
-	rb.row_num
+    rb.row_num
    ,rb.intake_yr
    ,rb.breed
    ,rb.num_intakes
 
 from 
-	row_num_breed_intakes rb
+    row_num_breed_intakes rb
 
 where 
-	rb.row_num = 1
+    rb.row_num = 1
 
 /* Conclusion: Pit Bull Mix was the breed with the most intakes for every year (2014-2022) except for 2019,
 when labrador retriever mix was the breed with the most intakes. However, interesting to note, the total 
