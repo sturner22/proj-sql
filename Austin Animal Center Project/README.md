@@ -9,7 +9,7 @@ Click on the files to view my sql queries. Here is a summary of some interesting
 * For dogs and cats with more than one intake between 2013 and 2023, stray is the most common intake type, followed by owner surrender.
 * Pit Bull Mix or Pit Bull was the dog breed with the most intakes for every year (2014-2022) except for 2019, when labrador retriever mix was the breed with the most intakes. 
 
-## SQL skills demonstrated in this project
+### SQL skills demonstrated in this project
 * Creating tables and importing data
 * Joins
 * Subqueries
@@ -25,7 +25,7 @@ To create this dashboard, I incorporated Austin Animal Center's outcome data alo
 
 The dashboard itself is meant to be exploratory in nature and includes records for only dogs and cats. The dashboard has four different charts and shows intake trends by year, patterns in average length of stay in the shelter based on age category, trends in intake types by year, and a Top N chart for dog breeds with the most intakes. The target audience includes members of the public or other stakeholders who are invested in companion animal welfare and want to identify trends or patterns that could spark ideas for further investigation or intervention. The goal for any animal shelter is to save as many pets as possible, and so knowing how many animals are coming in, how they are ending up in the shelter (e.g. stray, owner surrender, etc.) and how long they are staying may give shelter stakeholders insight into how they can maximize space and programs to help these animals find forever homes. 
 
-## Tableau skills demonstrated in this project 
+### Tableau skills demonstrated in this project 
 * Parameters
 * Parameter actions
 * Table calculations
